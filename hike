@@ -1,0 +1,142 @@
+#include<iostream>
+#include<fstream>
+#include<cstring>
+using namespace std;
+
+class Traseu {
+private:
+   int distanta;
+   char* puncteTuristice;
+   int durataOre;
+   string puncteDeInteres;
+   string harta;
+   const int id;
+   static int nrTraseu;
+
+public:
+   int getDistanta() { return this->distanta; }
+   void setDistanta(int distanta) {
+       if (distanta > 0) { this->distanta = distanta; }
+       else {
+           throw "Valoarea este negativa sau egala cu 0 ";
+       }
+   };
+
+   int getDurataOre() { return this->durataOre; }
+   string getPuncteDeInteres() { return this->puncteDeInteres; }
+   string getHarta() { return this->harta; }
+
+   char* getPuncteTuristice() {
+       char* getPuncteTuristice = new char[strlen(this->puncteTuristice) + 1];
+       strcpy(getPuncteTuristice, this->puncteTuristice);
+       return getPuncteTuristice;
+   }
+
+   Traseu() : id(++nrTraseu) {
+       this->distanta = 0;
+       this->puncteTuristice = nullptr;
+       this->durataOre = 0;
+       this->harta = "necunoscut";
+       this->puncteDeInteres = "necunoscut";
+   }
+
+   Traseu(int distanta, const char* puncteTuristice, int durataOre, string harta, string puncteDeInteres) : id(++nrTraseu) {
+       this->distanta = distanta;
+       if (this->puncteTuristice != nullptr) {
+           this->puncteTuristice = nullptr;
+       }
+       this->puncteTuristice = new char[strlen(puncteTuristice) + 1];
+
+       strcpy(this->puncteTuristice, puncteTuristice);
+
+       this->durataOre = durataOre;
+       this->harta = harta;
+       this->puncteDeInteres = puncteDeInteres;
+
+   }
+virtual void afisare() {
+       if (this->puncteTuristice != nullptr)
+           cout << endl << "Puncte turistice: " << this->puncteTuristice;
+       else
+           cout << endl << "Puncte turistice default";
+       cout << endl << "Distanta: " << this->distanta;
+       cout << endl << "Puncte de interes: " << this->puncteDeInteres;
+       cout << endl << "Harta: " << this->harta;
+       cout << endl << "Durata in ore: " << this->durataOre;
+       cout << endl << "Id traseu: " << this->id;
+   }
+
+   ~Traseu() {
+       if (puncteTuristice != nullptr) {
+           delete[] puncteTuristice;
+       }
+   }
+
+   int operator-(int valoare) {
+       return this->durataOre - valoare;
+   }
+
+   friend bool operator==(const Traseu& t1, const Traseu& t2) {
+       return ((t1.distanta == t2.distanta) && (strcmp(t1.puncteTuristice, t2.puncteTuristice) == 0) && (t1.durataOre == t2.durataOre)
+               && (t1.harta == t2.harta) && (t1.puncteDeInteres == t2.puncteDeInteres));
+   }
+
+   Traseu operator+(Traseu t)
+   {
+       Traseu traseu=*this;
+       traseu.durataOre=this->durataOre+t.durataOre;
+       return traseu;
+   }
+
+   Traseu(int durataOre):id(++nrTraseu)
+   {
+       this->durataOre=durataOre;
+   }
+};
+
+template<class T>
+T suma(T a, T b) {
+   return a + b;
+}
+
+int Traseu::nrTraseu = 0;
+
+// TraseuMontan is a Traseu
+class TraseuMontan : public Traseu {
+private:
+   int altitudine;
+
+public:
+   TraseuMontan(int distanta, const char* puncteTuristice, int durataOre, string harta, string puncteDeInteres, int altitudine)
+           : Traseu(distanta, puncteTuristice, durataOre, harta, puncteDeInteres), altitudine(altitudine) {}
+
+
+   void afisare()  {
+       this->Traseu::afisare();
+       cout << endl << "Altitudinea traseului: " << this->altitudine;
+   }
+};
+
+int main() {
+   Traseu t;
+
+   t.afisare();
+
+   Traseu t2(10, "punctul a punctul b", 10, "punctul a, punctul b", "punctul ab, c");
+   t2.afisare();
+   Traseu t1(10, "punctul a punctul b", 50, "punctul a, punctul b", "punctul ab, c");
+   t1.afisare();
+ TraseuMontan t3(10, "punctul a punctul b", 10, "punctul a, punctul b", "punctul ab, c", 10000);
+ t3.afisare();
+
+
+   cout<<endl<<"rezultat in urma functiei template: "<<endl;
+
+   Traseu t4(8);
+   Traseu t5(3);
+   Traseu t6=suma<Traseu>(t4, t5);
+   cout<<endl<<t6.getDurataOre();
+}
+
+
+
