@@ -1,0 +1,245 @@
+#include <iostream>
+#include<cstring>
+#include<fstream>
+using namespace std;
+
+class Petitie {
+private:
+   string nume;
+   string prenume;
+   string data;
+   int zileDepunere;
+   string categorie;
+   char* denumire;
+   static int nrPetitii;
+   const int id;
+   string stare;
+public:
+   // Constructor implicit
+   Petitie() : id(++nrPetitii) {
+       this->denumire=nullptr;
+       this->nume = "necunoscut";
+       this->prenume = "necunoscut";
+       this->data = "DD/MM/YYYY";
+       this->categorie = "necunoscut";
+       this->zileDepunere=0;
+       this->stare="Necunoscuta";
+   }
+
+   // Constructor cu parametri
+   Petitie(string nume, string prenume, string data, int zileDepunere,string categorie, const char* denumire, string stare) : id(++nrPetitii) {
+       this->nume = nume;
+       this->prenume = prenume;
+       this->data = data;
+       this->categorie = categorie;
+       this->zileDepunere=zileDepunere;
+
+       // Alocă memorie și copiază denumirea
+       if (denumire != nullptr) {
+           this->denumire = new char[strlen(denumire) + 1];
+           strcpy(this->denumire, denumire);
+       } else {
+           this->denumire = nullptr;
+       }
+
+       this->stare=stare;
+   }
+
+   // Destructor
+   ~Petitie() {
+       delete[] denumire;
+       cout << endl << "SE APELAZA DESTRUCTOR";
+   }
+
+   //metodele de acces
+   string getNume()
+   {
+       return this->nume;
+
+   }
+
+   string getStare()
+   {
+       return this->stare;
+   }
+
+   int getzileDepunere()
+   {
+       return this->zileDepunere;
+   }
+   string getPrenume()
+   {
+       return this->prenume;
+
+   }
+   string getData(){
+       return this->data;
+   }
+
+   string getCategorie(){
+       return this->categorie;
+   }
+   int getId(){
+       return this->id;
+   }
+
+   char* getDenumire() {
+       char* denumireDeReturnat = new char[strlen(this->denumire) + 1];
+       strcpy(denumireDeReturnat, this->denumire);
+       return denumireDeReturnat;
+   }
+
+
+   bool operator ! (){
+
+       return this->zileDepunere<=30;
+
+   }
+
+   string operator ~ () {
+       this->stare="Rezolvata";
+       return this->stare;
+
+   }
+
+
+   friend void operator<<(ostream& out, const Petitie& petitie) {
+       out<<endl<<"Id petitie: "<<petitie.id;
+       out << endl << "Nume solicitant: " << petitie.nume;
+       out << endl << "Prenume solicitant: " << petitie.prenume;
+       out << endl << "Data: " << petitie.data;
+       out<<endl<<"Zile de la depunere: "<<petitie.zileDepunere;
+       out << endl << "Categorie petitie: " << petitie.categorie;
+
+       if (petitie.denumire != nullptr) {
+           out << endl << "Denumire: " << petitie.denumire;
+       } else {
+           out << endl << "Denumire: necunoscuta";
+       }
+
+       out<<endl<<"Starea petitiei (deschisa/ rezolvata): "<<petitie.stare;
+   }
+
+   //citire txt
+   friend void operator>>(ifstream& inF, Petitie& p) {
+       inF>>p.nume;
+       inF>>p.prenume;
+       inF>>p.data;
+       inF>>p.zileDepunere;
+       inF>>p.categorie;
+       if(p.denumire!=nullptr)
+       {
+           delete[] p.denumire;
+           p.denumire=nullptr;
+       }
+       char buffer[50];
+       p.denumire=new char[strlen(buffer)+1];
+       strcpy(p.denumire, buffer);
+       inF>>p.stare;
+   }
+
+   //scriere fis txt
+   friend void operator<<(fstream& outF, Petitie p) {
+       outF<<endl<<"Id petitie: "<<p.id;
+       outF << endl << "Nume solicitant: " << p.nume;
+       outF << endl << "Prenume solicitant: " << p.prenume;
+       outF << endl << "Data: " << p.data;
+       outF<<endl<<"Zile de la depunere: "<<p.zileDepunere;
+       outF << endl << "Categorie petitie: " << p.categorie;
+
+       if (p.denumire != nullptr) {
+           outF << endl << "Denumire: " << p.denumire;
+       } else {
+           outF << endl << "Denumire: necunoscuta";
+       }
+
+       outF<<endl<<"Starea petitiei (deschisa/ rezolvata): "<<p.stare;
+
+   }
+
+   virtual void afisare(){
+       cout<<endl<<"Id petitie: "<<this->id;
+       cout << endl << "Nume solicitant: " << this->nume;
+       cout << endl << "Prenume solicitant: " << this->prenume;
+       cout << endl << "Data: " << this->data;
+       cout<<endl<<"Zile de la depunere: "<<this->zileDepunere;
+       cout << endl << "Categorie petitie: " << this->categorie;
+
+       if (this->denumire != nullptr) {
+           cout << endl << "Denumire: " << this->denumire;
+       } else {
+           cout << endl << "Denumire: necunoscuta";
+       }
+
+       cout<<endl<<"Starea petitiei (deschisa/ rezolvata): "<<this->stare;
+
+   }
+
+
+};
+
+class petitiaCurenta: public Petitie
+{
+private:
+   int cod;
+
+public:
+   petitiaCurenta(string nume, string prenume, string data, int zileDepunere,string categorie, const char* denumire, string stare,int cod):Petitie( nume, prenume, data, zileDepunere, categorie, denumire,  stare), cod(cod){
+
+   }
+
+   void afisare(){
+       this->Petitie::afisare();
+       cout<<endl<<"Codul petitiei curente: "<<this->cod<<endl;
+   }
+
+   petitiaCurenta():Petitie(), cod(0){
+
+   }
+};
+
+
+int Petitie::nrPetitii = 0;
+
+
+
+
+
+int main() {
+
+   /* Petitie p;
+   Petitie petitie;
+  cout<<p<<endl; */
+   petitiaCurenta p1("Ion", "Popescu", "10/10/2023", 20, "Petitie1", "petitie amenajare parc", "Deschisa", 3289248);
+/*   cout<<endl<<p1<<endl;
+  cout<<endl<<"Get denumire: "<<p1.getDenumire()<<endl;
+ if(!p
+   {
+       cout<<endl<<"Petitia are raspuns, nu depasit termenul legal de 30 zile"<<endl;
+   }
+   else
+   {
+       cout<<endl<<"Petitia nu are raspuns, a depasit termenul legal de 30 zile"<<endl;
+   }
+
+   cout<<endl<<"Stare initiala petitie: "<<p1.getStare()<<endl;
+
+   cout << endl << "Stare petitie dupa modificare: "<< ~p1 << endl;
+    */
+
+/*
+   fstream fileStream("Petitie.txt", ios::out);
+   fileStream << p1;
+   fileStream.close();
+*/
+
+  /* ifstream readingFileStream("Petitie.txt", ios::in);
+   readingFileStream >> p1;
+   readingFileStream.close();
+   cout<<p1; */
+
+  p1.afisare();
+
+
+
+}
