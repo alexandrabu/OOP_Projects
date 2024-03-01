@@ -1,0 +1,208 @@
+#include<iostream>
+#include<cstring>
+#include<fstream>
+using namespace std;
+
+
+class Firma{
+private:
+   string nume;
+   string data;
+   int durata;
+   string produse[60];
+   float* cantitati;
+   string preturi;
+   const int id;
+   static int codFirma;
+   int nrProduse;
+
+
+public:
+   string getNume(){return this->nume;}
+   string getData(){return this->data;}
+   int getDurata(){return this->durata;}
+   string* getProduse(){return this->produse;}
+   float* getCantitati(){
+       float* getcantitati=new float[this->nrProduse];
+       for(int i=0; i<this->nrProduse;i++)
+           getcantitati[i]=this->cantitati[i];
+       return getcantitati;
+   }
+
+
+   string getPreturi() { return this->preturi; }
+   int getId(){return this->id;}
+   int getnrProduse(){ return this->nrProduse;}
+
+
+
+
+
+
+   Firma(string nume, string data, int durata, string produse[60],
+         const float* cantitati, string preturi, int nrProduse):id(++codFirma)
+   {
+       this->nume=nume;
+       this->data=data;
+       this->nrProduse=nrProduse;
+       for(int i=0; i<this->nrProduse; i++)
+           this->produse[i]=produse[i];
+       if(this->cantitati!=nullptr) this->cantitati=nullptr;
+       this->cantitati=new float[this->nrProduse];
+       for(int i=0; i<this->nrProduse; i++)
+           this->cantitati[i]=cantitati[i];
+       this->preturi=preturi;
+       this->durata=durata;
+
+
+       delete[] cantitati;
+
+
+   }
+
+
+   virtual void afisare() {
+       cout << endl << "Nr produse: ";
+       cout << this->nrProduse;
+       cout << endl << "Preturi: ";
+       cout << this->preturi;
+       cout << endl << "Data: ";
+       cout << this->data;
+       cout << endl << "Nume client: ";
+       cout << this->nume;
+       cout << endl << "Id firma: ";
+       cout << this->id;
+  cout << endl << "Durata eveniment:";
+       cout << this->durata;
+       cout << " ore";
+       cout << endl;
+       cout << "Produse: ";
+       for (int i = 0; i < this->nrProduse; i++) {
+           cout << this->produse[i] << " ";
+       }
+       cout << endl << "Cantitatile comandate (kg): ";
+       if (this->cantitati != nullptr) {
+           for (int i = 0; i < this->nrProduse; i++) {
+               cout << this->cantitati[i];
+               cout << " ";
+           }
+           cout << endl;
+       } else {
+           cout << "cantitati default";
+           cout << endl;
+       }
+   }
+
+
+        friend void operator<<(ostream &out, Firma& f) {
+           cout << endl << "Nr produse: ";
+           out << f.nrProduse;
+           cout << endl << "Preturi: ";
+           out << f.preturi;
+           cout << endl << "Data: ";
+           out << f.data;
+           cout << endl << "Nume client: ";
+           out << f.nume;
+           cout << endl << "Id firma: ";
+           out << f.id;
+           cout << endl << "Durata eveniment:";
+           out << f.durata;
+           cout << " ore";
+           cout << endl;
+           cout << "Produse: ";
+           for (int i = 0; i < f.nrProduse; i++) {
+               out << f.produse[i] << " ";
+           }
+           cout << endl << "Cantitatile comandate (kg): ";
+           if (f.cantitati != nullptr) {
+               for (int i = 0; i < f.nrProduse; i++) {
+                   out << f.cantitati[i];
+                   cout << " ";
+               }
+               cout << endl;
+           } else {
+               cout << "cantitati default";
+               cout << endl;
+           }
+
+
+
+
+       }
+
+
+       string &operator[](int index) {
+           return this->produse[index];
+       }
+
+
+       void operator+=(string produsAdaugat) {
+           bool produsExistent = false;
+           for (int i = 0; i < nrProduse; i++) {
+               if (produsAdaugat == this->produse[i]) {
+                   this->cantitati[i] += 1;
+                   produsExistent = true;
+                   break;  // Nu are rost să continuăm verificarea după ce am găsit produsul existent
+               }
+           }
+
+
+           if (!produsExistent) {
+               this->produse[nrProduse] = produsAdaugat;
+               this->cantitati[nrProduse] = 1;
+               nrProduse++;
+           }
+       }
+
+
+
+
+
+
+};
+
+
+   class eveniment:public Firma{
+  private:
+       string numeEveniment;
+   public:
+       eveniment(string nume, string data, int durata, string produse[60],
+                 const float* cantitati, string preturi, int nrProduse, string numeEveniment):Firma( nume, data, durata,  produse,
+        cantitati, preturi,  nrProduse), numeEveniment(numeEveniment)
+       {
+           this->numeEveniment=numeEveniment;
+       }
+
+
+       void afisare()
+       {
+           this->Firma::afisare();
+           cout<<"numele evenimentului: "<<this->numeEveniment;
+       }
+   };
+
+
+int Firma::codFirma=0;
+
+
+int main(){
+   int j;
+   string produse[3]={"p1", "p2", "p3"};
+   Firma f("Ion popescu", "10/10/2020", 5,  produse, new float[3]{1,2,3},"100 lei, 100 lei, 500 lei", 3);
+  // cout<<"Pozitia produsului pe care vreti sa il accesati: ";
+   //cin>>j;
+  // cout<<"Ati accesat produsul: "<<f[j];
+
+
+   //f+="p3";
+
+
+   cout<<f;
+
+
+   eveniment e("Ion popescu", "10/10/2020", 5,  produse, new float[3]{1,2,3},"100 lei, 100 lei, 500 lei", 3, "Absolvire");
+   e.afisare();
+
+
+
+}
