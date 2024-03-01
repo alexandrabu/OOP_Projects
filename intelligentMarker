@@ -1,0 +1,129 @@
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+class MarkerE{
+private:
+   string culoare;
+   int dimensiune;
+   char* producator;
+   int acumulator;
+   const int id;
+   static int nrMarkerE;
+
+public:
+   //metode de acces
+   string getCuloare() { return this-> culoare; }
+   int getDimensiune() { return this->dimensiune; }
+   char* getProducator() {
+       char* producatorDeReturnat=new char[strlen(this->producator)+1];
+       strcpy(producatorDeReturnat, this->producator);
+       return producatorDeReturnat;
+   }
+   char getAcumulator() { return this-> acumulator; }
+   char getId() {return this->id; }
+
+   //constructor implicit
+   MarkerE():id(++nrMarkerE), producator(nullptr){
+       this->culoare=" ";
+       this->dimensiune=0;
+       this->acumulator=0;
+   }
+   //constructor cu toti parametrii
+   MarkerE(string culoare, int dimensiune, const char* producator, int acumulator):id(++nrMarkerE)
+   {
+       this->culoare=culoare;
+       this->dimensiune=dimensiune;
+       if(producator!= nullptr) {
+           this->producator = new char[strlen(producator) + 1];
+           strcpy(this->producator, producator);
+       }
+       else
+       {
+           this->producator=nullptr;
+       }
+
+  this->acumulator=acumulator;
+   }
+
+
+   //operatorii >> si <<
+
+   friend void operator<<(ostream& out, MarkerE m){
+       out<<endl<<"Culoare: "<<m.culoare;
+       out<<endl<<"Dimensiune: "<<m.dimensiune;
+       if(m.producator!= nullptr) { out<<endl<<"Producator: "<<m.producator;}
+       else { out<<endl<<"producator default "; }
+       out<<endl<<"Nivel acumulator: "<<m.acumulator;
+       out<<endl<<"Id: "<<m.id;
+   }
+
+   friend void operator>>(istream& in, MarkerE& m) ;
+/*
+   ~MarkerE(){
+       delete[] producator ;
+   } */
+
+   friend bool operator ==(const MarkerE& m1, const MarkerE& m2){
+       return((m1.dimensiune==m2.dimensiune) && (m1.acumulator==m2.acumulator));
+   }
+
+   virtual void afisare(){
+
+       cout<<endl<<"Culoare: "<<this->culoare;
+       cout<<endl<<"Dimensiune: "<<this->dimensiune;
+       if(this->producator!=nullptr) cout<<endl<<"Producator: "<<this->producator;
+       cout<<endl<<"Nivel acumulator: "<<this->acumulator;
+       cout<<endl<<"Id: "<<this->id;
+   }
+
+};
+
+class MarkerInteligent: public MarkerE{
+private:
+   int grosime;
+   string tipLinie;
+   int nivelPresiune;
+
+public:
+   MarkerInteligent(string culoare, int dimensiune, const char* producator, int acumulator, int grosime, string tipLinie, int nivelPresiune):MarkerE(culoare, dimensiune,  producator,  acumulator), grosime(grosime),tipLinie(tipLinie),nivelPresiune(nivelPresiune){}
+   void afisare(){
+       this->MarkerE::afisare();
+       cout<<endl<<this->grosime;
+       cout<<endl<<this->nivelPresiune;
+       cout<<endl<<this->tipLinie;
+
+
+   }
+};
+
+
+void operator>>(istream& in, MarkerE& m) {
+   in >> m.culoare;
+   in >> m.dimensiune;
+   char buffer[50];
+   in>>buffer;
+   m.producator = new char[strlen(buffer) + 1];
+   strcpy(m.producator, buffer);
+
+}
+
+int MarkerE::nrMarkerE=0;
+
+int main(){
+
+   MarkerE mark1("roz",20,"producator", 10);
+   MarkerE mark2("roz",10,"producator", 50);
+   if(mark1==mark2)
+   {
+       cout<<"markerele sunt la fel";
+   }
+   else{
+       cout<<"markerele nu sunt la fel";
+   }
+
+   MarkerInteligent mi("roz",20,"producator", 10, 15, "fina", 20);
+   mi.afisare();
+
+}
+
